@@ -4,3 +4,4 @@ chrome-app*
 node_modules
 Thumbs.db
 public/res/bower-libs
+.idea
