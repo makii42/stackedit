@@ -12,10 +12,13 @@ define([
     "classes/Provider",
     "classes/AsyncTask",
     "providers/bloggerProvider",
+    "providers/bloggerPageProvider",
     "providers/dropboxProvider",
     "providers/gistProvider",
     "providers/githubProvider",
     "providers/gdriveProvider",
+    "providers/gdrivesecProvider",
+    "providers/gdriveterProvider",
     "providers/sshProvider",
     "providers/tumblrProvider",
     "providers/wordpressProvider"
@@ -25,7 +28,7 @@ define([
 
     // Create a map with providerId: providerModule
     var providerMap = _.chain(arguments).map(function(argument) {
-        return argument instanceof Provider && [
+        return argument instanceof Provider && argument.isPublishEnabled === true && [
             argument.providerId,
             argument
         ];

@@ -18,6 +18,7 @@ define([
     "storage",
     "uilayout",
     'pagedown-ace',
+    'pagedown-light',
     'libs/ace_mode',
     'ace/requirejs/text!ace/css/editor.css',
     'ace/requirejs/text!ace/theme/textmate.css',
@@ -27,7 +28,7 @@ define([
 ], function($, _, crel, ace, constants, utils, storage, settings, eventMgr, shortcutMgr, mousetrap, bodyIndexHTML, bodyViewerHTML, settingsTemplateTooltipHTML, settingsUserCustomExtensionTooltipHTML) {
 
     var core = {};
-
+    
     // Used for periodic tasks
     var intervalId;
 
@@ -52,7 +53,7 @@ define([
         }
         return userActive && windowUnique;
     }
-
+    
     // Used to only have 1 window of the application in the same browser
     var windowId;
     function checkWindowUnique() {
@@ -71,6 +72,8 @@ define([
             }
             $(".modal").modal("hide");
             $('.modal-non-unique').modal("show");
+            // Attempt to close the window
+            window.close();
         }
     }
 
@@ -124,10 +127,18 @@ define([
         utils.setInputValue("#input-settings-max-width", settings.maxWidth);
         // Default content
         utils.setInputValue("#textarea-settings-default-content", settings.defaultContent);
+        // Mode
+        utils.setInputRadio("radio-settings-mode", storage.mode || '_ace_');
         // Commit message
         utils.setInputValue("#input-settings-publish-commit-msg", settings.commitMsg);
+        // Gdrive multi-accounts
+        utils.setInputValue("#input-settings-gdrive-multiaccount", settings.gdriveMultiAccount);
         // Gdrive full access
         utils.setInputChecked("#input-settings-gdrive-full-access", settings.gdriveFullAccess);
+        // Dropbox full access
+        utils.setInputChecked("#input-settings-dropbox-full-access", settings.dropboxFullAccess);
+        // GitHub full access
+        utils.setInputChecked("#input-settings-github-full-access", settings.githubFullAccess);
         // Template
         utils.setInputValue("#textarea-settings-publish-template", settings.template);
         // PDF template
@@ -162,10 +173,18 @@ define([
         newSettings.maxWidth = utils.getInputIntValue("#input-settings-max-width", event, 1);
         // Default content
         newSettings.defaultContent = utils.getInputValue("#textarea-settings-default-content");
+        // Mode
+        var mode = utils.getInputRadio("radio-settings-mode");
         // Commit message
         newSettings.commitMsg = utils.getInputTextValue("#input-settings-publish-commit-msg", event);
+        // Gdrive multi-accounts
+        newSettings.gdriveMultiAccount = utils.getInputIntValue("#input-settings-gdrive-multiaccount");
         // Gdrive full access
         newSettings.gdriveFullAccess = utils.getInputChecked("#input-settings-gdrive-full-access");
+        // Drobox full access
+        newSettings.dropboxFullAccess = utils.getInputChecked("#input-settings-dropbox-full-access");
+        // GitHub full access
+        newSettings.githubFullAccess = utils.getInputChecked("#input-settings-github-full-access");
         // Template
         newSettings.template = utils.getInputTextValue("#textarea-settings-publish-template", event);
         // PDF template
@@ -183,9 +202,13 @@ define([
         eventMgr.onSaveSettings(newSettings.extensionSettings, event);
 
         if(!event.isPropagationStopped()) {
+            if(settings.dropboxFullAccess !== newSettings.dropboxFullAccess) {
+                storage.removeItem('dropbox.lastChangeId');
+            }
             $.extend(settings, newSettings);
             storage.settings = JSON.stringify(settings);
-            storage.theme = theme;
+            storage.themeV3 = theme;
+            storage.mode = mode;
         }
     }
 
@@ -226,6 +249,7 @@ define([
         aceEditor.session.setUseWrapMode(true);
         aceEditor.session.setNewLineMode("unix");
         aceEditor.session.setMode("libs/ace_mode");
+        aceEditor.session.$selectLongWords = true;
 
         // Make bold titles...
         (function(self) {
@@ -304,15 +328,17 @@ define([
             livePaneResizing: true,
             enableCursorHotkey: false,
             resizerDblClickToggle: false,
-            north__spacing_open: 6,
-            north__spacing_closed: 6,
+            resizeWithWindow: false,
+            north__spacing_open: 1,
+            north__spacing_closed: 1,
             spacing_open: 35,
             spacing_closed: 35,
             togglerLength_open: 60,
             togglerLength_closed: 60,
             stateManagement__enabled: false,
-            center__minWidth: 200,
-            center__minHeight: 200,
+            north__minSize: 49,
+            center__minWidth: 250,
+            center__minHeight: 180,
             fxSettings: {
                 easing: "easeInOutQuad",
                 duration: 350
@@ -356,7 +382,7 @@ define([
             layout = $('body').layout($.extend(layoutGlobalConfig, {
                 east__resizable: true,
                 east__size: 0.5,
-                east__minSize: 260
+                east__minSize: 300
             }));
         }
         else if(settings.layoutOrientation == "vertical") {
@@ -374,7 +400,7 @@ define([
         });
         $(".ui-layout-toggler-south").addClass("btn btn-info").html('<i class="icon-none"></i>');
         $(".ui-layout-toggler-east").addClass("btn btn-info").html('<i class="icon-none"></i>');
-        var $northTogglerElt = $(".ui-layout-toggler-north").addClass("btn btn-info").html('<i class="icon-none"></i>');
+        var $northTogglerElt = $(".ui-layout-toggler-north").addClass("btn btn-info").html('<i class="icon-th"></i>');
 
         // We attach the preview buttons to the UI layout resizer in order to
         // have fixed position
@@ -386,12 +412,11 @@ define([
         $previewButtonsElt = $('<div class="extension-preview-buttons">');
         $editorButtonsElt = $('<div class="extension-editor-buttons">');
         if(window.viewerMode || settings.layoutOrientation == "horizontal") {
-            $('.ui-layout-resizer-north').append($resizerDecorator).append($previewButtonsElt);
-            $('.ui-layout-resizer-east').append($northTogglerElt).append($editorButtonsElt);
+            $('.ui-layout-resizer-north').append($previewButtonsElt);
+            $('.ui-layout-resizer-east').append($resizerDecorator).append($northTogglerElt).append($editorButtonsElt);
         }
         else {
-            $('.ui-layout-resizer-north').append($resizerDecorator);
-            $('.ui-layout-resizer-south').append($previewButtonsElt).append($editorButtonsElt).append($northTogglerElt);
+            $('.ui-layout-resizer-south').append($resizerDecorator).append($previewButtonsElt).append($editorButtonsElt).append($northTogglerElt);
         }
 
         setPanelVisibility();
@@ -400,6 +425,36 @@ define([
         eventMgr.onLayoutCreated(layout);
     }
 
+    var $navbarElt;
+    var $leftBtnElts;
+    var $rightBtnElts;
+    var $leftBtnDropdown;
+    var $rightBtnDropdown;
+    var marginWidth = 36 + 25 + 25;
+    var titleWidth = 18 + 348;
+    var leftButtonsWidth = 72 + 83 + 166 + 167 + 83;
+    var rightButtonsWidth = 36 + 84 + 83;
+    var rightButtonsDropdown = 42;
+    function adjustWindow() {
+        if(!window.viewerMode) {
+            var maxWidth = $navbarElt.width() - 5;
+            if(marginWidth + titleWidth + leftButtonsWidth + rightButtonsWidth > maxWidth) {
+                $rightBtnDropdown.show().find('.dropdown-menu').append($rightBtnElts);
+                if(marginWidth + titleWidth + leftButtonsWidth + rightButtonsDropdown > maxWidth) {
+                    $leftBtnDropdown.show().find('.dropdown-menu').append($leftBtnElts);
+                }
+                else {
+                    $leftBtnDropdown.hide().after($leftBtnElts);
+                }
+            }
+            else {
+                $leftBtnDropdown.hide().after($leftBtnElts);
+                $rightBtnDropdown.hide().after($rightBtnElts);
+            }
+        }
+        layout.resizeAll();
+    }
+    
     // Create the PageDown editor
     var editor;
     var $editorElt;
@@ -425,14 +480,29 @@ define([
         if(editor !== undefined) {
             // If the editor is already created
             aceEditor && aceEditor.selection.setSelectionRange(fileDesc.editorSelectRange);
-            (aceEditor && aceEditor.focus()) || $editorElt.focus();
+            aceEditor ? aceEditor.focus() : $editorElt.focus();
             editor.refreshPreview();
             return;
         }
 
         var $previewContainerElt = $(".preview-container");
 
-        if(!window.lightMode) {
+        if(window.lightMode) {
+            // Store editor scrollTop on scroll event
+            $editorElt.scroll(function() {
+                if(documentContent !== undefined) {
+                    fileDesc.editorScrollTop = $(this).scrollTop();
+                }
+            });
+            // Store editor selection on change
+            $editorElt.bind("keyup mouseup", function() {
+                if(documentContent !== undefined) {
+                    fileDesc.editorStart = this.selectionStart;
+                    fileDesc.editorEnd = this.selectionEnd;
+                }
+            });
+        }
+        else {
             // Store editor scrollTop on scroll event
             var saveScroll = _.debounce(function() {
                 if(documentContent !== undefined) {
@@ -448,16 +518,27 @@ define([
             }, 100);
             aceEditor.session.selection.on('changeSelection', saveSelection);
             aceEditor.session.selection.on('changeCursor', saveSelection);
-            // Store preview scrollTop on scroll event
-            $previewContainerElt.scroll(function() {
-                if(documentContent !== undefined) {
-                    fileDesc.previewScrollTop = $previewContainerElt.scrollTop();
-                }
-            });
         }
+        // Store preview scrollTop on scroll event
+        $previewContainerElt.scroll(function() {
+            if(documentContent !== undefined) {
+                fileDesc.previewScrollTop = $previewContainerElt.scrollTop();
+            }
+        });
 
         // Create the converter and the editor
         var converter = new Markdown.Converter();
+        var options = {
+            _DoItalicsAndBold: function(text) {
+                // Restore original markdown implementation
+                text = text.replace(/(\*\*|__)(?=\S)(.+?[*_]*)(?=\S)\1/g,
+                "<strong>$2</strong>");
+                text = text.replace(/(\*|_)(?=\S)(.+?)(?=\S)\1/g,
+                "<em>$2</em>");
+                return text;
+            }
+        };
+        converter.setOptions(options);
 
         function checkDocumentChanges() {
             var newDocumentContent = $editorElt.val();
@@ -472,101 +553,89 @@ define([
         }
         
         var previewWrapper;
-        if(!window.lightMode) {
+        if(window.lightMode) {
+            editor = new Markdown.EditorLight(converter);
+        }
+        else {
             editor = new Markdown.Editor(converter, undefined, {
                 keyStrokes: shortcutMgr.getPagedownKeyStrokes()
             });
-            // Custom insert link dialog
-            editor.hooks.set("insertLinkDialog", function(callback) {
-                core.insertLinkCallback = callback;
-                utils.resetModalInputs();
-                $(".modal-insert-link").modal();
+        }
+        // Custom insert link dialog
+        editor.hooks.set("insertLinkDialog", function(callback) {
+            core.insertLinkCallback = callback;
+            utils.resetModalInputs();
+            $(".modal-insert-link").modal();
+            return true;
+        });
+        // Custom insert image dialog
+        editor.hooks.set("insertImageDialog", function(callback) {
+            core.insertLinkCallback = callback;
+            if(core.catchModal) {
                 return true;
-            });
-            // Custom insert image dialog
-            editor.hooks.set("insertImageDialog", function(callback) {
-                core.insertLinkCallback = callback;
-                if(core.catchModal) {
-                    return true;
-                }
-                utils.resetModalInputs();
-                $(".modal-insert-image").modal();
-                return true;
-            });
+            }
+            utils.resetModalInputs();
+            $(".modal-insert-image").modal();
+            return true;
+        });
             
-            if(settings.lazyRendering === true) {
-                previewWrapper = function(makePreview) {
-                    var debouncedMakePreview = _.debounce(makePreview, 500);
-                    return function() {
-                        if(documentContent === undefined) {
-                            makePreview();
-                            eventMgr.onFileOpen(fileDesc);
-                            $previewContainerElt.scrollTop(fileDesc.previewScrollTop);
-                            _.defer(function() {
-                                aceEditor.renderer.scrollToY(fileDesc.editorScrollTop);
-                            });
+        if(settings.lazyRendering === true) {
+            previewWrapper = function(makePreview) {
+                var debouncedMakePreview = _.debounce(makePreview, 500);
+                return function() {
+                    if(documentContent === undefined) {
+                        makePreview();
+                        eventMgr.onFileOpen(fileDesc);
+                        $previewContainerElt.scrollTop(fileDesc.previewScrollTop);
+                        if(window.lightMode) {
+                            $editorElt.scrollTop(fileDesc.editorScrollTop);
                         }
                         else {
-                            debouncedMakePreview();
-                        }
-                        checkDocumentChanges();
-                    };
-                };
-            }
-            else {
-                previewWrapper = function(makePreview) {
-                    return function() {
-                        makePreview();
-                        if(documentContent === undefined) {
-                            eventMgr.onFileOpen(fileDesc);
-                            $previewContainerElt.scrollTop(fileDesc.previewScrollTop);
                             _.defer(function() {
                                 aceEditor.renderer.scrollToY(fileDesc.editorScrollTop);
                             });
                         }
-                        checkDocumentChanges();
-                    };
+                    }
+                    else {
+                        debouncedMakePreview();
+                    }
+                    checkDocumentChanges();
                 };
-            }
+            };
         }
         else {
-            // That's the light Markdown editor replacing the one from pagedown
-            var $wmdPreviewElt = $('#wmd-preview');
-            var hooks = new Markdown.HookCollection();
-            hooks.addNoop("onPreviewRefresh");
-            var makePreviewHtml = function() {
-                var text = $editorElt.val();
-                text = converter.makeHtml(text);
-                $wmdPreviewElt.html(text);
-                hooks.onPreviewRefresh();
-            };
-            var debouncedMakePreview = _.debounce(makePreviewHtml, 1000);
-            var lightPreviewWrapper = function() {
-                if(documentContent === undefined) {
-                    makePreviewHtml();
-                    eventMgr.onFileOpen(fileDesc);
-                }
-                else {
-                    debouncedMakePreview();
-                }
-                checkDocumentChanges();
-            };
-            $editorElt.on("input propertychange", lightPreviewWrapper);
-            editor = {
-                hooks: hooks,
-                getConverter: function() {
-                    return converter;
-                },
-                run: lightPreviewWrapper,
-                refreshPreview: lightPreviewWrapper
+            previewWrapper = function(makePreview) {
+                return function() {
+                    makePreview();
+                    if(documentContent === undefined) {
+                        eventMgr.onFileOpen(fileDesc);
+                        $previewContainerElt.scrollTop(fileDesc.previewScrollTop);
+                        if(window.lightMode) {
+                            $editorElt.scrollTop(fileDesc.editorScrollTop);
+                        }
+                        else {
+                            _.defer(function() {
+                                aceEditor.renderer.scrollToY(fileDesc.editorScrollTop);
+                            });
+                        }
+                    }
+                    checkDocumentChanges();
+                };
             };
         }
 
         eventMgr.onPagedownConfigure(editor);
         editor.hooks.chain("onPreviewRefresh", eventMgr.onAsyncPreview);
-        editor.run(aceEditor, previewWrapper);
-        aceEditor && aceEditor.selection.setSelectionRange(fileDesc.editorSelectRange);
-        (aceEditor && aceEditor.focus()) || $editorElt.focus();
+        if(window.lightMode) {
+            editor.run(previewWrapper);
+            editor.undoManager.reinit(initDocumentContent, fileDesc.editorStart, fileDesc.editorEnd, fileDesc.editorScrollTop);
+            $editorElt.focus();
+        }
+        else {
+            editor.run(aceEditor, previewWrapper);
+            aceEditor.selection.setSelectionRange(fileDesc.editorSelectRange);
+            aceEditor.focus();
+        }
 
         // Hide default buttons
         $(".wmd-button-row li").addClass("btn btn-success").css("left", 0).find("span").hide();
@@ -590,16 +659,6 @@ define([
         $("#wmd-redo-button").append($('<i class="icon-forward">')).appendTo($btnGroupElt);
     };
     
-    // Shows a dialog to force the user to click a button before opening oauth popup
-    var redirectCallbackConfirm;
-    var redirectCallbackCancel;
-    core.redirectConfirm = function(message, callbackConfirm, callbackCancel) {
-        redirectCallbackConfirm = callbackConfirm;
-        redirectCallbackCancel = callbackCancel;
-        $('.modal-redirect-confirm .redirect-msg').html(message);
-        $('.modal-redirect-confirm').modal("show");
-    };
-
     // Initialize multiple things and then fire eventMgr.onReady
     var isDocumentPanelShown = false;
     var isMenuPanelShown = false;
@@ -610,9 +669,23 @@ define([
         else {
             document.body.innerHTML = bodyIndexHTML;
         }
+        $navbarElt = $('.navbar');
+        $leftBtnElts = $navbarElt.find('.left-buttons');
+        $rightBtnElts = $navbarElt.find('.right-buttons');
+        $leftBtnDropdown = $navbarElt.find('.left-buttons-dropdown');
+        $rightBtnDropdown = $navbarElt.find('.right-buttons-dropdown');
+        $(window).bind("resize", adjustWindow);
+        
+        // Initialize utils library
+        utils.init();
         
         // Populate shortcuts in settings
         shortcutMgr.addSettingEntries();
+        
+        // Hide shortcuts settings if light mode
+        if(window.lightMode) {
+            $('.tab-settings-shortcuts').hide();
+        }
 
         // listen to online/offline events
         $(window).on('offline', core.setOffline);
@@ -638,6 +711,10 @@ define([
                 isMenuPanelShown = true;
                 menuPanelBackdropElt = utils.createBackdrop('collapse', '.menu-panel');
                 $menuPanelElt.addClass('move-to-front');
+                // To avoid opening delay
+                setTimeout(function() {
+                    $menuPanelElt.trigger($.support.transition.end);
+                }, 50);
             }
             else {
                 // Close all open sub-menus when one submenu opens
@@ -648,7 +725,7 @@ define([
                 isMenuPanelShown = false;
                 menuPanelBackdropElt.parentNode.removeChild(menuPanelBackdropElt);
                 $menuPanelElt.removeClass('move-to-front');
-                (aceEditor && aceEditor.focus()) || $editorElt.focus();
+                aceEditor ? aceEditor.focus() : $editorElt.focus();
             }
         }).on('hidden.bs.collapse', function(e) {
             if(e.target === $menuPanelElt[0]) {
@@ -666,6 +743,10 @@ define([
                 isDocumentPanelShown = true;
                 documentPanelBackdropElt = utils.createBackdrop('collapse', '.document-panel');
                 $documentPanelElt.addClass('move-to-front');
+                // To avoid opening delay
+                setTimeout(function() {
+                    $documentPanelElt.trigger($.support.transition.end);
+                }, 50);
             }
             else {
                 // Close all open sub-menus when one submenu opens
@@ -676,7 +757,7 @@ define([
                 isDocumentPanelShown = false;
                 documentPanelBackdropElt.parentNode.removeChild(documentPanelBackdropElt);
                 $documentPanelElt.removeClass('move-to-front');
-                (aceEditor && aceEditor.focus()) || $editorElt.focus();
+                aceEditor ? aceEditor.focus() : $editorElt.focus();
             }
         }).on('hidden.bs.collapse', function(e) {
             if(e.target === $documentPanelElt[0]) {
@@ -693,7 +774,7 @@ define([
             });
         }
         
-        $editorElt = $("#wmd-input").css({
+        $editorElt = $("#wmd-input, .textarea-helper").css({
             // Apply editor font
             "font-family": settings.editorFontFamily,
             "font-size": settings.editorFontSize + "px",
@@ -724,6 +805,8 @@ define([
         }, 1000);
 
         eventMgr.onReady();
+        // Adjust the layout after the dom has changed
+        adjustWindow();
     };
 
     // Other initialization that are not prioritary
@@ -741,17 +824,21 @@ define([
             $documentPanelElt.collapse('hide');
             isModalShown = true;
         }).on('shown.bs.modal', function() {
-            // Focus on the first input when modal opens
-            var elt = $(this);
+            var $elt = $(this);
             setTimeout(function() {
-                elt.find("input:enabled:visible:first").focus();
+                // When modal opens focus on the first button
+                $elt.find('.btn:first').focus();
+                // Or on the first link if any
+                $elt.find('button:first').focus();
+                // Or on the first input if any
+                $elt.find("input:enabled:visible:first").focus();
             }, 50);
         }).on('hidden.bs.modal', function() {
             // Focus on the editor when modal is gone
             isModalShown = false;
-            (aceEditor && aceEditor.focus()) || $editorElt.focus();
+            aceEditor ? aceEditor.focus() : $editorElt.focus();
             // Revert to current theme when settings modal is closed
-            applyTheme(storage.theme);
+            applyTheme(window.theme);
         }).keyup(function(e) {
             // Handle enter key in modals
             if(e.which == 13 && !$(e.target).is("textarea")) {
@@ -862,7 +949,7 @@ define([
         });
         $(".action-import-docs-settings-confirm").click(function() {
             storage.clear();
-            var allowedKeys = /^file\.|^focusMode$|^folder\.|^publish\.|^settings$|^sync\.|^theme$|^version$|^welcomeTour$/;
+            var allowedKeys = /^file\.|^focusMode$|^folder\.|^publish\.|^settings$|^sync\.|^google\.|^themeV3$|^mode$|^version$|^welcomeTour$/;
             _.each(newstorage, function(value, key) {
                 if(allowedKeys.test(key)) {
                     storage[key] = value;
@@ -878,6 +965,9 @@ define([
         $(".action-default-settings").click(function() {
             storage.removeItem("settings");
             storage.removeItem("theme");
+            if(!settings.dropboxFullAccess) {
+                storage.removeItem('dropbox.lastChangeId');
+            }
             window.location.reload();
         });
 
@@ -892,58 +982,40 @@ define([
         });
 
         // Tooltips
-        $(".tooltip-lazy-rendering").tooltip({
-            container: '.modal-settings',
-            placement: 'right',
-            trigger: 'hover',
-            title: 'Disable preview rendering while typing in order to offload CPU. Refresh preview after 500 ms of inactivity.'
-        });
-        $(".tooltip-default-content").tooltip({
-            html: true,
-            container: '.modal-settings',
-            placement: 'right',
-            trigger: 'hover',
-            title: [
-                'Thanks for supporting StackEdit by adding a backlink in your documents!<br/><br/>',
-                '<b class="text-danger">NOTE: Backlinks in Stack Exchange Q/A are not welcome.</b>'
-            ].join('')
-        });
-        var tooltipOpen = false;
-        $(".tooltip-usercustom-extension").tooltip({
-            html: true,
-            container: '.modal-settings',
-            placement: 'right',
-            trigger: 'manual',
-            title: settingsUserCustomExtensionTooltipHTML
-        }).click(function(e) {
-            $(this).tooltip('show');
-            $(document).on("click.tooltip-usercustom-extension", function() {
-                tooltipOpen = false;
-                $(".tooltip-usercustom-extension").tooltip('hide');
-                $(document).off("click.tooltip-usercustom-extension");
-            });
-            !tooltipOpen && e.stopPropagation();
-            tooltipOpen = true;
-        });
-        _.each(document.querySelectorAll(".tooltip-template"), function(tooltipElt) {
-            var $tooltipElt = $(tooltipElt);
-            $tooltipElt.tooltip({
-                html: true,
-                container: $tooltipElt.parents('.modal'),
-                placement: 'right',
-                trigger: 'manual',
-                title: settingsTemplateTooltipHTML
-            }).click(function(e) {
-                $tooltipElt.tooltip('show');
-                $(document).on("click.tooltip-template", function() {
-                    tooltipOpen = false;
-                    $(".tooltip-template").tooltip('hide');
-                    $(document).off("click.tooltip-template");
+        var openedTooltip;
+        function createTooltip(selector, content) {
+            _.each(document.querySelectorAll(selector), function(tooltipElt) {
+                var $tooltipElt = $(tooltipElt);
+                $tooltipElt.tooltip({
+                    html: true,
+                    container: $tooltipElt.parents('.modal-content'),
+                    placement: 'right',
+                    trigger: 'manual',
+                    title: content
+                }).click(function() {
+                    var elt = this;
+                    if(openedTooltip && openedTooltip[0] === elt) {
+                        return;
+                    }
+                    _.defer(function() {
+                        $(document).on("click.close-tooltip", function() {
+                            openedTooltip && openedTooltip.tooltip('hide');
+                            openedTooltip = undefined;
+                            $(document).off("click.close-tooltip");
+                        });
+                        openedTooltip = $(elt).tooltip('show');
+                    });
                 });
-                !tooltipOpen && e.stopPropagation();
-                tooltipOpen = true;
             });
-        });
+        }
+        
+        createTooltip(".tooltip-lazy-rendering", 'Disable preview rendering while typing in order to offload CPU. Refresh preview after 500 ms of inactivity.');
+        createTooltip(".tooltip-default-content", [
+            'Thanks for supporting StackEdit by adding a backlink in your documents!<br/><br/>',
+            '<b class="text-danger">NOTE: Backlinks in Stack Exchange Q/A are not welcome.</b>'
+        ].join(''));
+        createTooltip(".tooltip-usercustom-extension", settingsUserCustomExtensionTooltipHTML);
+        createTooltip(".tooltip-template", settingsTemplateTooltipHTML);
 
         // Avoid dropdown panels to close on click
         $("div.dropdown-menu").click(function(e) {
@@ -955,16 +1027,6 @@ define([
             backdrop: "static",
             keyboard: false,
             show: false
-        });
-        
-        $('.action-redirect-confirm').click(function() {
-            redirectCallbackCancel = undefined;
-            redirectCallbackConfirm();
-        });
-        $('.modal-redirect-confirm').on('hidden.bs.modal', function() {
-            _.defer(function() {
-                redirectCallbackCancel && redirectCallbackCancel();
-            });
         });
         
         // Load images

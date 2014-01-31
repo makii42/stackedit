@@ -58,31 +58,25 @@ var MarkdownHighlightRules = function() {
         next : "header"
     },
     { // Github style block
-        token : "code_block",
+        token : "constant.language.escape",
         regex : "^```\\s*[a-zA-Z]*(?:{.*?\\})?\\s*$",
         next  : "githubblock"
     }, { // block quote
-        token : "blockquote",
-        regex : "^\\s*>\\s*(?:[*+-]|\\d+\\.)?\\s+",
+        token : ["constant.language.escape", "blockquote"],
+        regex : "(^\\s*>\\s*(?:[*+-]|\\d+\\.)?)(\\s+)",
         next  : "blockquote"
     }, { // HR * - _
         token : "constant",
         regex : "^ {0,2}(?:(?: ?\\* ?){3,}|(?: ?\\- ?){3,}|(?: ?\\_ ?){3,})\\s*$",
         next: "allowBlock"
     }, { // list
-        token : "markup.list",
-        regex : "^\\s{0,3}(?:[*+-]|\\d+\\.)\\s+",
+        token : ["constant.language.escape", "markup.list"],
+        regex : "(^\\s{0,3}(?:[*+-]|\\d+\\.))(\\s+)",
         next  : "listblock-start"
-    }, { // Escaped $
-        token : "text",
-        regex : "\\\\\\$",
     }, { // Math block
         token : "constant.language.escape",
         regex : "\\$\\$|\\\\\\\\\\[|\\\\\\\\\\\\\\\\\\(",
         next  : "mathblock"
-    }, { // Math inline
-        token : ["constant.language.escape", "keyword", "constant.language.escape"],
-        regex : "(\\$)(.*)(\\$)"
     }, { // LaTeX block
         token : ["keyword", "text"],
         regex : "(\\\\?\\\\begin)(\\{[a-z]*\\*?\\})",
@@ -95,17 +89,23 @@ var MarkdownHighlightRules = function() {
         "basic" : [{
             token : "constant.language.escape",
             regex : /\\[\\`*_{}\[\]()#+\-.!]/
+        }, { // Escaped $
+            token : "text",
+            regex : "\\\\\\$",
+        }, { // Math inline
+            token : ["constant.language.escape", "keyword", "constant.language.escape"],
+            regex : "(\\$)(.*?)(\\$)"
         }, { // code span `
-            token : "code",
+            token : ["constant.language.escape", "code", "constant.language.escape"],
             regex : "(`+)(.*?[^`])(\\1)"
         }, { // reference
-            token : ["text", "reference", "text", "link", "description", "text"],
+            token : ["constant.language.escape", "reference", "constant.language.escape", "link", "description", "constant.language.escape"],
             regex : "^([ ]{0,3}\\[)([^\\]]+)(\\]:\\s*)([^ ]+)(\\s*(?:[\"][^\"]+[\"])?(\\s*))$"
         }, { // link by reference
-            token : ["text", "markup.underline", "text", "reference", "text"],
+            token : ["constant.language.escape", "markup.underline", "constant.language.escape", "reference", "constant.language.escape"],
             regex : "(\\[)((?:[[^\\]]*\\]|[^\\[\\]])*)(\\][ ]?(?:\\n[ ]*)?\\[)(.*?)(\\])"
         }, { // link by url
-            token : ["text", "markup.underline", "text", "link", "description", "text"],
+            token : ["constant.language.escape", "markup.underline", "constant.language.escape", "link", "description", "constant.language.escape"],
             regex : "(\\[)"+
                     "(\\[[^\\]]*\\]|[^\\[\\]]*)"+
                     "(\\]\\([ \\t]*)"+
@@ -113,10 +113,10 @@ var MarkdownHighlightRules = function() {
                     "((?:[ \t]*\"(?:.*?)\"[ \\t]*)?)"+
                     "(\\))"
         }, { // strong ** __
-            token : "strong",
+            token : ["constant.language.escape", "strong", "constant.language.escape"],
             regex : "([*]{2}|[_]{2}(?=\\S))(.*?\\S[*_]*)(\\1)"
         }, { // emphasis * _
-            token : "emphasis",
+            token : ["constant.language.escape", "emphasis", "constant.language.escape"],
             regex : "([*]|[_](?=\\S))(.*?\\S[*_]*)(\\1)"
         }, { //
             token : ["text", "url", "text"],
@@ -153,8 +153,8 @@ var MarkdownHighlightRules = function() {
             regex : "^$",
             next  : "start"
         }, { // list
-            token : "markup.list",
-            regex : "^\\s{0,3}(?:[*+-]|\\d+\\.)\\s+",
+            token : ["constant.language.escape", "markup.list"],
+            regex : "(^\\s{0,3}(?:[*+-]|\\d+\\.))(\\s+)",
             next  : "listblock-start"
         }, {
             include : "basic", noEscape: true
@@ -167,8 +167,8 @@ var MarkdownHighlightRules = function() {
             regex : "^\\s*$",
             next  : "start"
         }, { // block quote
-            token : "blockquote",
-            regex : "^\\s*>\\s*(?:[*+-]|\\d+\\.)?\\s+",
+            token : ["constant.language.escape", "blockquote"],
+            regex : "(^\\s*>\\s*(?:[*+-]|\\d+\\.)?)(\\s+)",
             next  : "blockquote"
         }, {
             include : "basic", noEscape: true
@@ -177,7 +177,7 @@ var MarkdownHighlightRules = function() {
         } ],
 
         "githubblock" : [ {
-            token : "code_block",
+            token : "constant.language.escape",
             regex : "^```",
             next  : "start"
         }, {

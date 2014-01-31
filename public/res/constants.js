@@ -1,6 +1,6 @@
 define([], function() {
     var constants = {};
-    constants.VERSION = "2.3.3";
+    constants.VERSION = "3.1.5";
     
     constants.MAIN_URL = "https://stackedit.io/";
     constants.GOOGLE_ANALYTICS_ACCOUNT_ID = "UA-39556145-1";
@@ -8,6 +8,8 @@ define([], function() {
     constants.GOOGLE_DRIVE_APP_ID = "241271498917";
     constants.DROPBOX_APP_KEY = "lq6mwopab8wskas";
     constants.DROPBOX_APP_SECRET = "851fgnucpezy84t";
+    constants.DROPBOX_RESTRICTED_APP_KEY = "sw0hlixhr8q1xk0";
+    constants.DROPBOX_RESTRICTED_APP_SECRET = "1r808p2xygs6lbg";
     constants.BITLY_ACCESS_TOKEN = "317e033bfd48cf31155a68a536b1860013b09c4c";
     constants.DEFAULT_FILE_TITLE = "Title";
     constants.DEFAULT_FOLDER_NAME = "New folder";
@@ -27,14 +29,6 @@ define([], function() {
     constants.SSH_PROXY_URL = "https://stackedit-ssh-proxy.herokuapp.com/";
     constants.HTMLTOPDF_URL = "https://stackedit-htmltopdf.herokuapp.com/";
     
-    // Use by Google's client.js
-    window.delayedFunction = undefined;
-    window.runDelayedFunction = function() {
-        if(window.delayedFunction !== undefined) {
-            window.delayedFunction();
-        }
-    };
-    
     // Site dependent
     constants.BASE_URL = "http://localhost/";
     constants.GOOGLE_CLIENT_ID = '241271498917-lev37kef013q85avc91am1gccg5g8lrb.apps.googleusercontent.com';
@@ -51,8 +45,7 @@ define([], function() {
         constants.GATEKEEPER_URL = "https://stackedit-io-gatekeeper.herokuapp.com/";
         constants.TUMBLR_PROXY_URL = "https://stackedit-io-tumblr-proxy.herokuapp.com/";
     }
-    
-    if(location.hostname.indexOf("benweet.github.io") === 0) {
+    else if(location.hostname.indexOf("benweet.github.io") === 0) {
         constants.BASE_URL = 'http://benweet.github.io/stackedit/';
         constants.GOOGLE_CLIENT_ID = '241271498917-jpto9lls9fqnem1e4h6ppds9uob8rpvu.apps.googleusercontent.com';
         constants.GITHUB_CLIENT_ID = 'fa0d09514da8377ee32e';
@@ -61,8 +54,7 @@ define([], function() {
         constants.WORDPRESS_CLIENT_ID = '3185';
         constants.WORDPRESS_PROXY_URL = "https://stackedit-wordpress-proxy.herokuapp.com/";
     }
-    
-    if(location.hostname.indexOf("benweet.insomnia247.nl") === 0) {
+    else if(location.hostname.indexOf("benweet.insomnia247.nl") === 0) {
         constants.BASE_URL = "http://benweet.insomnia247.nl/stackedit/";
         constants.GOOGLE_CLIENT_ID = '241271498917-52hae7a08hv7ltenv7km8h7lghno9sk3.apps.googleusercontent.com';
         constants.GITHUB_CLIENT_ID = 'd2943d6074b2d9c4a830';
@@ -72,7 +64,7 @@ define([], function() {
     
     constants.THEME_LIST = {
         "default": "Default",
-        "blue-gray": "Blue-Gray",
+        "gray": "Gray",
         "night": "Night",
         "school": "School",
     };

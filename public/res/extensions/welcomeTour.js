@@ -21,6 +21,19 @@ define([
             },
             onEnd: function() {
                 storage.welcomeTour = 'done';
+                var tooltip = $('.button-markdown-syntax').parent().tooltip({
+                    html: true,
+                    container: $('.extension-preview-buttons'),
+                    placement: 'bottom',
+                    trigger: 'manual',
+                    title: 'Need help with Markdown syntax?'
+                }).tooltip('show').addClass('info-tooltip');
+                tooltip.one('click', function() {
+                    tooltip.tooltip('hide').removeClass('info-tooltip');
+                });
+                setTimeout(function() {
+                    tooltip.tooltip('hide').removeClass('info-tooltip');
+                }, 15000);
             },
             template: [
                 '<div class="popover tour">',
@@ -32,7 +45,7 @@ define([
                 '       <button class="btn btn-default" data-role="end">Got it!</button>',
                 '   </nav>',
                 '</div>'
-            ].join("")
+            ].join(""),
         });
         tour.addSteps([
             {
@@ -46,7 +59,7 @@ define([
                 placement: 'bottom',
             },
             {
-                element: '.navbar .action-create-file',
+                element: '.navbar-inner > .nav .action-create-file, .navbar .right-buttons-dropdown > .nav > .btn:not(:hidden)',
                 title: 'New document',
                 content: 'Click the <i class="icon-file"></i> <code>New document</code> button to create a new document.',
                 placement: 'left',
@@ -57,7 +70,7 @@ define([
                 title: 'Toggle document',
                 content: [
                     '<p>Click the <i class="icon-folder-open"></i> <code>Select document</code> button to switch to another document.</p>',
-                    '<b>NOTE: </b>Use <code>Ctrl+[</code> and <code>Ctrl+]</code> shortcuts to toggle quickly.'
+                    'Use <code>Ctrl+[</code> and <code>Ctrl+]</code> shortcuts to toggle quickly.'
                 ].join(""),
                 placement: 'left',
                 reflex: true,
@@ -73,24 +86,24 @@ define([
                 reflex: true,
             },
             {
-                element: '#extension-buttons .button-synchronize',
+                element: '.navbar-inner > .nav .button-synchronize, .navbar .right-buttons-dropdown > .nav > .btn:not(:hidden)',
                 title: 'Synchronize',
-                content: '<p>Once imported/exported, use the <i class="icon-refresh"></i> <code>Synchronize</code> button to force the synchronization (this is done automatically every 3 minutes).</p>',
-                placement: 'bottom',
+                content: '<p>Once imported or exported, use the <i class="icon-refresh"></i> <code>Synchronize</code> button to force the synchronization</p>This is done automatically every 3 minutes.',
+                placement: 'left',
                 reflex: true,
             },
             {
-                element: '#extension-buttons .button-publish',
-                title: 'Update publications',
-                content: 'Once published, use the <i class="icon-share"></i> <code>Publish</code> button to update your publication.',
-                placement: 'bottom',
+                element: '.navbar-inner > .nav .button-publish, .navbar .right-buttons-dropdown > .nav > .btn:not(:hidden)',
+                title: 'Update publication',
+                content: 'Once published, use the <i class="icon-share"></i> <code>Publish</code> button to update the publication.',
+                placement: 'left',
                 reflex: true,
             },
             {
                 element: '.navbar-inner',
                 title: 'Happy StackWriting!',
                 content: [
-                    'Enjoy, and don\'t forget to rate <b>StackEdit</b> on <a target="_blank" href="https://chrome.google.com/webstore/detail/stackedit/iiooodelglhkcpgbajoejffhijaclcdg/reviews">Chrome Web Store</a>.',
+                    'Enjoy, and don\'t forget to rate <b>StackEdit</b> on <a target="_blank" href="https://chrome.google.com/webstore/detail/stackedit/iiooodelglhkcpgbajoejffhijaclcdg/reviews">Chrome Web Store</a>...',
                 ].join(""),
                 placement: 'bottom',
             },

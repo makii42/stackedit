@@ -17,10 +17,10 @@ define([
         $bodyElt = $(document.body);
         $workingIndicatorElt = $('<div class="hide">');
         $('.working-indicator').append($workingIndicatorElt);
-        for (var i = 0; i < 4; i++) {
+        for (var i = 0; i < 3; i++) {
             $workingIndicatorElt.append($('<div class="bar">').css({
-                'animation-delay': (i*2/10).toPrecision(3) + 's',
-                '-webkit-animation-delay': (i*2/10).toPrecision(3) + 's',
+                'animation-delay': (i*15/100).toPrecision(3) + 's',
+                '-webkit-animation-delay': (i*15/100).toPrecision(3) + 's',
             }));
         }
     };

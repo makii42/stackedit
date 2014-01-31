@@ -15,6 +15,7 @@ define([
     "extensions/dialogAbout",
     "extensions/dialogManagePublication",
     "extensions/dialogManageSynchronization",
+    "extensions/dialogManageSharing",
     "extensions/dialogOpenHarddrive",
     "extensions/documentTitle",
     "extensions/documentSelector",
@@ -30,7 +31,6 @@ define([
     "extensions/buttonFocusMode",
     "extensions/buttonSync",
     "extensions/buttonPublish",
-    "extensions/buttonShare",
     "extensions/buttonStat",
     "extensions/buttonHtmlCode",
     "extensions/buttonViewer",
@@ -120,7 +120,15 @@ define([
     eventMgr.onLoadSettings = function() {
         logger.log("onLoadSettings");
         _.each(extensionList, function(extension) {
-            utils.setInputChecked("#input-enable-extension-" + extension.extensionId, extension.enabled === true);
+            var isChecked = !extension.isOptional || extension.config.enabled === undefined || extension.config.enabled === true;
+            utils.setInputChecked("#input-enable-extension-" + extension.extensionId, isChecked);
+            // Special case for Markdown Extra and MathJax
+            if(extension.extensionId == 'markdownExtra') {
+                utils.setInputChecked("#input-settings-markdown-extra", isChecked);
+            }
+            else if(extension.extensionId == 'mathJax') {
+                utils.setInputChecked("#input-settings-mathjax", isChecked);
+            }
             var onLoadSettingsListener = extension.onLoadSettings;
             onLoadSettingsListener && onLoadSettingsListener();
         });
@@ -130,6 +138,20 @@ define([
         _.each(extensionList, function(extension) {
             var newExtensionConfig = _.extend({}, extension.defaultConfig);
             newExtensionConfig.enabled = utils.getInputChecked("#input-enable-extension-" + extension.extensionId);
+            var isChecked;
+            // Special case for Markdown Extra and MathJax
+            if(extension.extensionId == 'markdownExtra') {
+                isChecked = utils.getInputChecked("#input-settings-markdown-extra");
+                if(isChecked != extension.enabled) {
+                    newExtensionConfig.enabled = isChecked;
+                }
+            }
+            else if(extension.extensionId == 'mathJax') {
+                isChecked = utils.getInputChecked("#input-settings-mathjax");
+                if(isChecked != extension.enabled) {
+                    newExtensionConfig.enabled = isChecked;
+                }
+            }
             var onSaveSettingsListener = extension.onSaveSettings;
             onSaveSettingsListener && onSaveSettingsListener(newExtensionConfig, event);
             newExtensionSettings[extension.extensionId] = newExtensionConfig;
@@ -203,6 +225,7 @@ define([
                         html += elt.innerHTML;
                     });
                     html = html.replace(/^<div class="se-section-delimiter"><\/div>\n\n/gm, '');
+                    html = html.replace(/ <span class="comment label label-danger">.*<\/span> /g, '');
                     onPreviewFinished(utils.trim(html));
                 });
             };
@@ -241,7 +264,7 @@ define([
             var accordionHtml = _.chain(extensionList).sortBy(function(extension) {
                 return extension.extensionName.toLowerCase();
             }).reduce(function(html, extension) {
-                return html + (extension.settingsBlock ? _.template(settingsExtensionsAccordionHTML, {
+                return html + (extension.settingsBlock && !(window.lightMode === true && extension.disableInLight === true) ? _.template(settingsExtensionsAccordionHTML, {
                     extensionId: extension.extensionId,
                     extensionName: extension.extensionName,
                     isOptional: extension.isOptional,
@@ -249,7 +272,7 @@ define([
                 }) : "");
             }, "").value();
             document.querySelector('.accordion-extensions').innerHTML = accordionHtml;
-
+            
             // Create extension buttons
             logger.log("onCreateButton");
             var onCreateButtonListenerList = getExtensionListenerList("onCreateButton");
@@ -257,7 +280,7 @@ define([
             _.each(onCreateButtonListenerList, function(listener) {
                 extensionButtonsFragment.appendChild(createBtn(listener));
             });
-            document.getElementById('extension-buttons').appendChild(extensionButtonsFragment);
+            document.querySelector('.extension-buttons').appendChild(extensionButtonsFragment);
 
             // Create extension editor buttons
             logger.log("onCreateEditorButton");

@@ -194,6 +194,75 @@ define([
         version = "v11";
     }
 
+    // Upgrade from v11 to v12
+    if(version == "v11") {
+        // Force new theme by using themeV3 variable
+        localStorage.removeItem("theme");
+        if(_.has(localStorage, 'settings')) {
+            settings = JSON.parse(localStorage.settings);
+            // Force new font
+            delete settings.editorFontFamily;
+            delete settings.editorFontSize;
+            settings.template && (settings.template = settings.template.replace('https://stackedit.io/res-min/themes/default.css', 'https://stackedit.io/res-min/themes/base.css'));
+            settings.pdfTemplate && (settings.pdfTemplate = settings.pdfTemplate.replace('https://stackedit.io/res-min/themes/default.css', 'https://stackedit.io/res-min/themes/base.css'));
+            localStorage.settings = JSON.stringify(settings);
+        }
+        version = "v12";
+    }
+
+    // Upgrade from v12/v13 to v14
+    if(version == "v12" || version == "v13") {
+        if(_.has(localStorage, 'settings')) {
+            settings = JSON.parse(localStorage.settings);
+            // Have to reset the font because of Monaco issue with ACE
+            delete settings.editorFontFamily;
+            localStorage.settings = JSON.stringify(settings);
+        }
+        version = "v14";
+    }
+
+    // Upgrade from v14 to v15
+    if(version == "v14") {
+        if(_.has(localStorage, 'settings')) {
+            settings = JSON.parse(localStorage.settings);
+            settings.template && (settings.template = settings.template.replace('https://stackedit.io/res-min/themes/default.css', 'https://stackedit.io/res-min/themes/base.css'));
+            settings.pdfTemplate && (settings.pdfTemplate = settings.pdfTemplate.replace('https://stackedit.io/res-min/themes/default.css', 'https://stackedit.io/res-min/themes/base.css'));
+            localStorage.settings = JSON.stringify(settings);
+        }
+        version = "v15";
+    }
+
+    // Upgrade from v15 to v16
+    if(version == "v15") {
+        localStorage.removeItem('gdrivePermissions');
+        if(_.has(localStorage, 'gdrive.lastChangeId')) {
+            localStorage['google.gdrive0.gdrive.lastChangeId'] = localStorage['gdrive.lastChangeId'];
+            localStorage.removeItem('gdrive.lastChangeId');
+        }
+        if(_.has(localStorage, 'settings')) {
+            settings = JSON.parse(localStorage.settings);
+            if(((settings.extensionSettings || {}).markdownExtra || {}).extensions) {
+                settings.extensionSettings.markdownExtra.extensions.push('newlines');
+                settings.extensionSettings.markdownExtra.extensions.push('strikethrough');
+            }
+            localStorage.settings = JSON.stringify(settings);
+        }
+        version = "v16";
+    }
+
+    // Upgrade from v16 to v17
+    if(version == "v16") {
+        _.each(_.keys(localStorage), function(key) {
+            var matchResult = key.match(/(file\.\S+\.)\S+/);
+            if(matchResult) {
+                if(!_.has(localStorage, matchResult[1] + 'title')) {
+                    localStorage.removeItem(key);
+                }
+            }
+        });
+        version = "v17";
+    }
+    
     localStorage.version = version;
     return localStorage;
 });

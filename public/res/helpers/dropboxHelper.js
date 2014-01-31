@@ -4,11 +4,13 @@ define([
     "underscore",
     "constants",
     "core",
+    "utils",
     "storage",
     "logger",
+    "settings",
     "eventMgr",
     "classes/AsyncTask",
-], function($, _, constants, core, storage, logger, eventMgr, AsyncTask) {
+], function($, _, constants, core, utils, storage, logger, settings, eventMgr, AsyncTask) {
 
     var client;
     var authenticated = false;
@@ -39,8 +41,8 @@ define([
                 timeout: constants.AJAX_TIMEOUT
             }).done(function() {
                 client = new Dropbox.Client({
-                    key: constants.DROPBOX_APP_KEY,
-                    secret: constants.DROPBOX_APP_SECRET
+                    key: settings.dropboxFullAccess === true ? constants.DROPBOX_APP_KEY : constants.DROPBOX_RESTRICTED_APP_KEY,
+                    secret: settings.dropboxFullAccess === true ? constants.DROPBOX_APP_SECRET : constants.DROPBOX_RESTRICTED_APP_SECRET
                 });
                 client.authDriver(new Dropbox.AuthDriver.Popup({
                     receiverUrl: constants.BASE_URL + "html/dropbox-oauth-receiver.html",
@@ -66,7 +68,7 @@ define([
             }
             var immediate = true;
             function oauthRedirect() {
-                core.redirectConfirm('You are being redirected to <strong>Dropbox</strong> authorization page.', function() {
+                utils.redirectConfirm('You are being redirected to <strong>Dropbox</strong> authorization page.', function() {
                     task.chain(localAuthenticate);
                 }, function() {
                     task.error(new Error('Operation canceled.'));
@@ -299,7 +301,7 @@ define([
                 return;
             }
             function chooserRedirect() {
-                core.redirectConfirm('You are being redirected to <strong>Dropbox Chooser</strong> page.', function() {
+                utils.redirectConfirm('You are being redirected to <strong>Dropbox Chooser</strong> page.', function() {
                     task.chain();
                 }, function() {
                     task.error(new Error('Operation canceled.'));

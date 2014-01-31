@@ -98,6 +98,12 @@ define([
 
     fileMgr.deleteFile = function(fileDesc) {
         fileDesc = fileDesc || fileMgr.currentFile;
+        
+        // Unassociate file from folder
+        if(fileDesc.folder) {
+            fileDesc.folder.removeFile(fileDesc);
+            eventMgr.onFoldersChanged();
+        }
 
         // Remove the index from the file list
         utils.removeIndexFromArray("file.list", fileDesc.fileIndex);
@@ -129,6 +135,7 @@ define([
         storage.removeItem(fileDesc.fileIndex + ".editorEnd");
         storage.removeItem(fileDesc.fileIndex + ".editorScrollTop");
         storage.removeItem(fileDesc.fileIndex + ".previewScrollTop");
+        storage.removeItem(fileDesc.fileIndex + ".editorSelectRange");
 
         eventMgr.onFileDeleted(fileDesc);
     };
@@ -169,6 +176,9 @@ define([
             fileMgr.selectFile(fileDesc);
             $fileTitleElt.click();
         });
+        $('.action-remove-file-confirm').click(function() {
+            $('.modal-remove-file-confirm').modal('show');
+        });
         $(".action-remove-file").click(function() {
             fileMgr.deleteFile();
         });
@@ -192,7 +202,7 @@ define([
                 eventMgr.onTitleChanged(fileDesc);
             }
             $fileTitleInputElt.val(fileDesc.title);
-            (aceEditor && aceEditor.focus()) || $editorElt.focus();
+            aceEditor ? aceEditor.focus() : $editorElt.focus();
         }
         $fileTitleInputElt.blur(function() {
             applyTitle();

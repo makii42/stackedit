@@ -2,38 +2,62 @@
 	<div class="navbar-inner">
 		<div class="nav left-space"></div>
 		<div class="nav right-space pull-right"></div>
-		<ul class="nav">
+		<div class="left-buttons-dropdown dropdown">
+    		<div class="nav">
+        		<button class="btn btn-success" data-toggle="dropdown"
+            		title="Show buttons">
+            		<i class="icon-th-large"></i>
+            	</button>
+    		    <div class="dropdown-menu">
+        		</div>
+        	</div>
+		</div>
+		<ul class="nav left-buttons">
 			<li class="wmd-button-group1 btn-group"></li>
 		</ul>
-		<ul class="nav">
+		<ul class="nav left-buttons">
 			<li class="wmd-button-group2 btn-group"></li>
 		</ul>
-		<ul class="nav">
+		<ul class="nav left-buttons">
 			<li class="wmd-button-group3 btn-group"></li>
 		</ul>
-		<ul class="nav">
+		<ul class="nav left-buttons">
 			<li class="wmd-button-group4 btn-group"></li>
 		</ul>
-		<ul class="nav pull-right">
+		<div class="right-buttons-dropdown dropdown">
+    		<div class="nav pull-right">
+        		<button class="btn btn-success" data-toggle="dropdown"
+            		title="Show buttons">
+            		<i class="icon-th-large"></i>
+            	</button>
+    		    <div class="dropdown-menu">
+        		</div>
+        	</div>
+		</div>
+		<ul class="nav pull-right right-buttons">
 			<li class="btn-group"><button
 					class="btn btn-success action-create-file" title="New document">
 					<i class="icon-file"></i>
 				</button>
-				<button class="btn btn-success" title="Delete document"
-					data-toggle="modal" data-target=".modal-remove-file-confirm">
+				<button class="btn btn-success action-remove-file-confirm" title="Delete document">
 					<i class="icon-trash"></i>
 				</button></li>
 		</ul>
-		<ul class="nav pull-right">
-			<li id="extension-buttons"></li>
+		<ul class="nav pull-right right-buttons">
+			<li class="offline-status hide">
+			    <div class="text-danger">
+			        <i class="icon-attention-circled"></i>offline
+			    </div>
+			</li>
+			<li class="extension-buttons"></li>
 		</ul>
 		<ul class="nav pull-right">
 			<li><div class="working-indicator"></div></li>
 			<li><a class="btn btn-success file-title-navbar" href="#"
 				title="Rename document"> </a></li>
-			<li><input type="text"
+			<li><div class="input-file-title-container"><input type="text"
 				class="col-lg-4 form-control hide input-file-title"
-				placeholder="Document title" /></li>
+				placeholder="Document title" /></div></li>
 		</ul>
 	</div>
 </div>
@@ -43,10 +67,10 @@
 <div id="wmd-button-bar" class="hide"></div>
 
 <div class="menu-panel collapse width">
-	<button class="btn btn-success collapse-button" data-toggle="collapse"
+	<button class="btn collapse-button" data-toggle="collapse"
 		data-target=".menu-panel" title="Menu">
-		<i class="icon-left-open"></i> <img
-			data-stackedit-src="stackedit-64.png" width="32" height="32" />
+		<img
+			data-stackedit-src="menu-icon.png" width="24" height="24" />
 	</button>
 	<div class="panel-content">
 		<div class="list-group">
@@ -84,7 +108,7 @@
 		<div class=dropdown-header>SYNCHRONIZE</div>
 		<div class="list-group">
 			<a href="#" data-toggle="collapse"
-				data-target=".collapse-sync-gdrive" class="list-group-item"><i
+				data-target=".collapse-sync-gdrive" class="list-group-item submenu-sync-gdrive"><i
 				class="icon-provider-gdrive"></i> Google Drive</a>
 			<div class="sub-menu collapse collapse-sync-gdrive clearfix">
 				<ul class="nav">
@@ -93,6 +117,30 @@
 							Google Drive</a></li>
 					<li><a href="#" class="action-sync-export-dialog-gdrive">Export
 							to Google Drive</a></li>
+				</ul>
+			</div>
+			<a href="#" data-toggle="collapse"
+				data-target=".collapse-sync-gdrivesec" class="list-group-item submenu-sync-gdrivesec"><i
+				class="icon-provider-gdrive"></i> Google Drive (2nd account)</a>
+			<div class="sub-menu collapse collapse-sync-gdrivesec clearfix">
+				<ul class="nav">
+					<li><a href="#" class="action-sync-import-gdrivesec"
+						data-toggle="collapse" data-target=".menu-panel">Import from
+							Google Drive</a></li>
+					<li><a href="#" class="action-sync-export-dialog-gdrivesec">Export
+							to Google Drive</a></li>
+				</ul>
+			</div>
+			<a href="#" data-toggle="collapse"
+				data-target=".collapse-sync-gdriveter" class="list-group-item submenu-sync-gdriveter"><i
+				class="icon-provider-gdrive"></i> Google Drive (3rd account)</a>
+			<div class="sub-menu collapse collapse-sync-gdriveter clearfix">
+				<ul class="nav">
+					<li><a href="#" class="action-sync-import-gdriveter"
+						data-toggle="collapse" data-target=".menu-panel">Import from
+							Google Drive</a></li>
+					<li><a href="#" class="action-sync-export-dialog-gdriveter">Export
+							to Google Drive</li>
 				</ul>
 			</div>
 			<a href="#" data-toggle="collapse"
@@ -122,6 +170,9 @@
 			<a href="#" data-toggle="modal" data-target=".modal-manage-publish"
 				class="action-reset-input list-group-item"><i class="icon-share"></i>
 				Manage publication</a>
+			<a href="#" data-toggle="modal" data-target=".modal-manage-sharing"
+				class="action-reset-input list-group-item"><i class="icon-provider-stackedit"></i>
+				Sharing...</a>
 		</div>
 		<ul class="nav">
 			<li><a href="#" data-toggle="modal"
@@ -136,9 +187,9 @@
 
 
 <div class="document-panel collapse width">
-	<button class="btn btn-success collapse-button" data-toggle="collapse"
+	<button class="btn collapse-button" data-toggle="collapse"
 		data-target=".document-panel" title="Select document">
-		<i class="icon-folder-open"></i> <i class="icon-right-open"></i>
+		<i class="icon-folder-open"></i>
 	</button>
 	<div class="search-bar clearfix">
 		<div class="input-group">
@@ -432,80 +483,10 @@
 
 
 <div class="modal modal-upload-gdrive">
-	<div class="modal-dialog">
-		<div class="modal-content">
-
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal"
-					aria-hidden="true">&times;</button>
-				<h3 class="modal-title">Export to Google Drive</h3>
-			</div>
-			<div class="modal-body">
-				<p>
-					This will save "<span class="file-title"></span>" to your <i
-						class="icon-provider-gdrive"></i>
-					<code>Google Drive</code>
-					account and keep it synchronized.
-				</p>
-				<div class="form-horizontal">
-					<div class="form-group">
-						<label class="col-lg-3 control-label"
-							for="input-sync-export-gdrive-parentid">Folder ID
-							(optional)</label>
-						<div class="col-lg-8">
-							<div class="input-group">
-								<input type="text" id="input-sync-export-gdrive-parentid"
-									placeholder="FolderID" class="form-control">
-								<div class="input-group-btn">
-									<a class="btn btn-link export-gdrive-choose-folder"
-										title="Choose folder" data-dismiss="modal"><i
-										class="icon-folder-open"></i></a>
-								</div>
-							</div>
-							<span class="help-block"> If no folder ID is supplied, the
-								file will be created in your root folder. </span>
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="col-lg-3 control-label"></div>
-						<div class="col-lg-8">
-							<label> <input id="input-sync-export-gdrive-realtime"
-								type="checkbox"> Create a real time collaborative
-								document
-							</label>
-						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-lg-3 control-label"
-							for="input-sync-export-gdrive-fileid">Existing file ID
-							(optional)</label>
-						<div class="col-lg-8">
-							<input type="text" id="input-sync-export-gdrive-fileid"
-								placeholder="FileID" class="form-control"> <span
-								class="help-block"> This will overwrite the existing file
-								on the server. </span>
-						</div>
-					</div>
-				</div>
-				<blockquote>
-					<b>NOTE:</b>
-					<ul>
-						<li>You can move or rename the file afterwards within Google
-							Drive.</li>
-						<li>Real time collaborative documents can't be open outside
-							StackEdit.</li>
-						<li>Real time collaborative documents can't have multiple
-							synchronized locations.</li>
-					</ul>
-				</blockquote>
-			</div>
-			<div class="modal-footer">
-				<a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-				<a href="#" data-dismiss="modal"
-					class="btn btn-primary action-sync-export-gdrive">OK</a>
-			</div>
-		</div>
-	</div>
+</div>
+<div class="modal modal-upload-gdrivesec">
+</div>
+<div class="modal modal-upload-gdriveter">
 </div>
 
 
@@ -576,9 +557,9 @@
 					<b>NOTE:</b> Removing a synchronized location will not delete any
 					file.
 				</blockquote>
+				<p class="msg-no-sync hide">"<span class="file-title"></span>" is not synchronized yet.</p>
 				<blockquote class="msg-no-sync hide">
-					"<span class="file-title"></span>" is not synchronized yet. <br />
-					<br /> <b>NOTE:</b> You can add synchronized locations by
+					<b>Tip:</b> You can add synchronized locations by
 					exporting your document using <i class="icon-provider-gdrive"></i>
 					<code>Google Drive</code>
 					or <i class="icon-provider-dropbox"></i>
@@ -702,7 +683,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-group modal-publish-blogger">
+					<div class="form-group modal-publish-blogger modal-publish-bloggerpage">
 						<label class="col-lg-4 control-label"
 							for="input-publish-blogger-url">Blog URL</label>
 						<div class="col-lg-7">
@@ -736,6 +717,15 @@
 							existing post ID (optional)</label>
 						<div class="col-lg-7">
 							<input type="text" id="input-publish-postid" placeholder="PostID"
+								class="form-control">
+						</div>
+					</div>
+					<div
+						class="form-group modal-publish-bloggerpage">
+						<label class="col-lg-4 control-label" for="input-publish-pageid">Update
+							existing page ID (optional)</label>
+						<div class="col-lg-7">
+							<input type="text" id="input-publish-pageid" placeholder="PageID"
 								class="form-control">
 						</div>
 					</div>
@@ -813,10 +803,22 @@
 					</div>
 				</div>
 				<blockquote class="front-matter-info modal-publish-blogger modal-publish-tumblr modal-publish-wordpress">
-                    <p><b>NOTE:</b> You can use a
+                    <p><b>Tip:</b> You can use a
                     <a href="http://jekyllrb.com/docs/frontmatter/"
                     target="_blank">YAML front matter</a> to specify the title and the tags/labels of your publication.</p>
-                    <p><b>Interpreted variables:</b> <i>title, tags</i></p>
+                    <p><b>Interpreted variables:</b> <code>title</code>, <code>tags</code>, <code>published</code>, <code>date</code>.</p>
+				</blockquote>
+				<blockquote class="front-matter-info modal-publish-bloggerpage">
+                    <p><b>Tip:</b> You can use a
+                    <a href="http://jekyllrb.com/docs/frontmatter/"
+                    target="_blank">YAML front matter</a> to specify the title of your page.</p>
+                    <p><b>Interpreted variables:</b> <code>title</code>.</p>
+				</blockquote>
+				<blockquote class="url-info modal-publish-bloggerpage">
+                    <p><b>About URL:</b> For newly created page , Blogger API will append a generated number to the url like <code>about-me-1234.html</code>, if you deeply care about your URL naming, you should first create the page on Blogger and then update them with StackEdit specifying the pageId when publishing.
+                    </p>
+                    <p><b>About page visibility:</b> Blogger API does not respect published status for pages.When publishing the page to Blogger, the page will be <strong>live</strong> but not added to the page listing. You should arrange the page listing from Blogger dashboard.
+                    </p>
 				</blockquote>
 			</div>
 			<div class="modal-footer">
@@ -844,12 +846,47 @@
 					location(s):
 				</p>
 				<div class="msg-publish-list publish-list hide"></div>
-				<blockquote>
-					<div class="msg-no-publish hide">
-						"<span class="file-title"></span>" is not published yet. <br /> <br />
-					</div>
-					<b>NOTE:</b> You can add publications using the <i class="icon-share"></i> <code>Publish on</code> sub-menu.
+				<blockquote class="msg-publish-list hide">
+					<b>NOTE:</b> Removing a publish location will not delete the actual publication.
 				</blockquote>
+				<p class="msg-no-publish hide">
+					"<span class="file-title"></span>" is not published yet.
+				</p>
+				<blockquote class="msg-no-publish hide">
+					<b>Tip:</b> You can add publications using the <i class="icon-share"></i> <code>Publish on</code> sub-menu.
+				</blockquote>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal modal-manage-sharing">
+	<div class="modal-dialog">
+		<div class="modal-content">
+
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"
+					aria-hidden="true">&times;</button>
+				<h3 class="modal-title">Sharing</h3>
+			</div>
+			<div class="modal-body">
+				<p class="msg-share-list hide">
+					"<span class="file-title"></span>" can be shared using the following link(s):
+				</p>
+            	<div class="msg-share-list share-list hide"></div>
+            	<p class="msg-no-share hide">To share this document within StackEdit you need first to <a
+            		href="#" class="action-publish-gist" data-dismiss="modal">publish it as a Gist</a> in
+            		Markdown format.
+            	</p>
+            	<blockquote>
+            		<b>Tip:</b> You can open any URL within StackEdit using <a
+            			href="viewer#!url=https://raw.github.com/benweet/stackedit/master/README.md"
+            			title="Sharing example"><code>viewer#!url=</code></a>.
+            	</blockquote>
 			</div>
 			<div class="modal-footer">
 				<a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
@@ -869,10 +906,10 @@
 				<h3 class="modal-title">Settings</h3>
 				<ul class="nav nav-tabs">
 					<li class="active"><a class="action-load-settings"
-						href="#tabpane-settings-editor" data-toggle="tab">Editor</a></li>
+						href="#tabpane-settings-basic" data-toggle="tab">Basic</a></li>
 					<li><a class="action-load-settings"
-						href="#tabpane-settings-services" data-toggle="tab">Services</a></li>
-					<li><a class="action-load-settings"
+						href="#tabpane-settings-advanced" data-toggle="tab">Advanced</a></li>
+					<li><a class="action-load-settings tab-settings-shortcuts"
 						href="#tabpane-settings-shortcuts" data-toggle="tab">Shortcuts</a></li>
 					<li><a class="action-load-settings"
 						href="#tabpane-settings-extensions" data-toggle="tab">Extensions</a></li>
@@ -883,7 +920,7 @@
 			<div class="modal-body">
 
 				<div class="tab-content clearfix">
-					<div class="tab-pane active" id="tabpane-settings-editor">
+					<div class="tab-pane active" id="tabpane-settings-basic">
 						<div class="form-horizontal">
 							<div class="form-group">
 								<label class="col-lg-4 control-label">Layout orientation</label>
@@ -906,9 +943,69 @@
 								<label class="col-lg-4 control-label" for="input-settings-theme">Theme</label>
 								<div class="col-lg-7">
 									<select id="input-settings-theme" class="form-control">
-									</select> <span class="help-block"><a target="_blank"
-										href="https://github.com/benweet/stackedit/blob/master/doc/theming.md#stackedit-theming-guide">Create
-											your own theme...</a></span>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-4"></div>
+								<div class="col-lg-7">
+									<div class="checkbox">
+									    <label>
+										    <input type="checkbox" id="input-settings-markdown-extra" />
+										    <b>Markdown Extra/GitHub Flavored Markdown</b> syntax
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-4"></div>
+								<div class="col-lg-7">
+									<div class="checkbox">
+									    <label>
+										    <input type="checkbox" id="input-settings-mathjax" />
+										    <b>LaTeX mathematical expressions</b> using <code>$</code> and <code>$$</code> delimiters
+										</label>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-lg-4 control-label"
+									for="input-settings-gdrive-multiaccount">Google Drive multi-accounts</a>
+								</label>
+								<div class="col-lg-7">
+									<select id="input-settings-gdrive-multiaccount" class="form-control">
+    									<option value="1">1 account</option>
+    									<option value="2">2 accounts</option>
+    									<option value="3">3 accounts</option>
+									</select>
+									<span class="help-block"><b>Please sign in first with Google.</b> Once linked with your Google accounts, changing account is not possible unless you reset the application.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" id="tabpane-settings-advanced">
+						<div class="form-horizontal">
+							<div class="form-group">
+								<label class="col-lg-4 control-label">Mode</label>
+								<div class="col-lg-7">
+									<div class="radio">
+										<label> <input type="radio"
+											name="radio-settings-mode" value="_ace_">
+											Normal (ACE)
+										</label>
+									</div>
+									<div class="radio">
+										<label> <input type="radio"
+											name="radio-settings-mode" value="_light_">
+											Light (textarea)
+										</label>
+									</div>
+									<div class="radio">
+										<label> <input type="radio"
+											name="radio-settings-mode" value="_light_rtl_">
+											Light + Right-to-left
+										</label>
+									</div>
 								</div>
 							</div>
 							<div class="form-group">
@@ -952,23 +1049,6 @@
 										class="form-control"></textarea>
 								</div>
 							</div>
-						</div>
-					</div>
-					<div class="tab-pane" id="tabpane-settings-services">
-						<div class="form-horizontal">
-							<div class="form-group">
-								<label class="col-lg-4 control-label">Permission</label>
-								<div class="col-lg-7">
-									<div class="checkbox">
-									    <label>
-										    <input type="checkbox" id="input-settings-gdrive-full-access" />
-										    Allow StackEdit to open any document in Google Drive
-										</label> <span class="help-block">You need to revoke any existing token in
-										<a href="https://www.google.com/settings/dashboard" target="_blank">Google Dashboard</a>
-										for this change to take effect.</span>
-									</div>
-								</div>
-							</div>
 							<div class="form-group">
 								<label class="col-lg-4 control-label"
 									for="textarea-settings-publish-template">Default
@@ -1001,6 +1081,44 @@
 								</div>
 							</div>
 							<div class="form-group">
+								<label class="col-lg-4 control-label">Permissions</label>
+								<div class="col-lg-7">
+									<div class="checkbox">
+									    <label>
+										    <input type="checkbox" id="input-settings-gdrive-full-access" />
+										    Allow StackEdit to open any document in Google Drive
+										</label> <span class="help-block">Existing authorization has to be revoked in
+										<a href="https://www.google.com/settings/dashboard" target="_blank">Google Dashboard</a>
+										for this change to take effect.</span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-4"></div>
+								<div class="col-lg-7">
+									<div class="checkbox">
+									    <label>
+										    <input type="checkbox" id="input-settings-dropbox-full-access" />
+										    Allow StackEdit to open any document in Dropbox
+										</label> <span class="help-block">If unchecked, access will be restricted to folder
+										<b>/Applications/StackEdit</b> for existing files.</span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-lg-4"></div>
+								<div class="col-lg-7">
+									<div class="checkbox">
+									    <label>
+										    <input type="checkbox" id="input-settings-github-full-access" />
+										    Allow StackEdit to access private repositories in GitHub
+										</label> <span class="help-block">Existing authorization has to be revoked in
+										<a href="https://github.com/settings/applications" target="_blank">GitHub settings</a>
+										for this change to take effect.</span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
 								<label class="col-lg-4 control-label"
 									for="input-settings-publish-commit-msg">GitHub commit message</label>
 								<div class="col-lg-7">
@@ -1025,39 +1143,37 @@
 					<div class="tab-pane" id="tabpane-settings-extensions">
 						<div class="panel-group accordion-extensions"></div>
 						<span class="help-block pull-right"><a target="_blank"
-							href="https://github.com/benweet/stackedit/blob/master/doc/developer-guide.md#architecture">Create
+							href="https://github.com/benweet/stackedit/blob/master/doc/developer-guide.md#developer-guide">Create
 								your own extension...</a></span>
 					</div>
 					<div class="tab-pane" id="tabpane-settings-utils">
 						<div class="tab-pane-button-container">
 							<a href="#" class="btn btn-block btn-primary action-welcome-file"
-								data-dismiss="modal"><i class="icon-help-circled icon-white"></i>
+								data-dismiss="modal"><i class="icon-help-circled"></i>
 								Welcome document</a> <a href="#"
 								class="btn btn-block btn-primary action-welcome-tour"
 								data-dismiss="modal" data-dismiss="modal"><i
-								class="icon-help-circled icon-white"></i> Welcome tour</a>
+								class="icon-help-circled"></i> Welcome tour</a>
 						</div>
 						<div class="tab-pane-button-container">
 							<a href="#"
 								class="btn btn-block btn-primary action-import-docs-settings"><i
-								class="icon-cog-alt icon-white"></i> Import docs & settings</a> <a href="#"
+								class="icon-cog-alt"></i> Import docs & settings</a> <a href="#"
 								class="btn btn-block btn-primary action-export-docs-settings"
-								data-dismiss="modal"><i class="icon-cog-alt icon-white"></i>
+								data-dismiss="modal"><i class="icon-cog-alt"></i>
 								Export docs & settings</a> <input type="file"
 								id="input-file-import-docs-settings" class="hide">
 						</div>
 						<div class="tab-pane-button-container">
 							<a href="#"
 								class="btn btn-block btn-primary action-default-settings"
-								data-dismiss="modal"><i class="icon-wrench icon-white"></i>
+								data-dismiss="modal"><i class="icon-wrench"></i>
 								Load default settings</a> <a href="#" class="btn btn-block btn-primary"
 								data-dismiss="modal" data-toggle="modal"
 								data-target=".modal-app-reset"><i
-								class="icon-fire icon-white"></i> Reset application</a> <a target="_blank" href="recovery.html" class="btn btn-block btn-primary"><i
-								class="icon-medkit icon-white"></i> StackEdit recovery</a>
+								class="icon-fire"></i> Reset application</a> <a target="_blank" href="recovery.html" class="btn btn-block btn-primary"><i
+								class="icon-medkit"></i> StackEdit recovery</a>
 						</div>
-						<span class="help-block text-center"><a target="_blank"
-							href="http://benweet.github.io/stackedit/recovery.html">Old platform recovery</a></span>
 					</div>
 				</div>
 
@@ -1102,7 +1218,8 @@
 				<h3 class="modal-title">Redirection</h3>
 			</div>
 			<div class="modal-body">
-				<blockquote><b>NOTE:</b> <span class="redirect-msg"></span></blockquote>
+			    <p class="redirect-msg"></p>
+				<blockquote>Please click <b>OK</b> to proceed.</blockquote>
 			</div>
 			<div class="modal-footer">
 				<a class="btn btn-default" data-dismiss="modal">Cancel</a>
@@ -1157,3 +1274,4 @@
 
 <div class="lock-ui hide"></div>
 <div id="dropboxjs" data-app-key="x0k2l8puemfvg0o"></div>
+<div class="textarea-helper"></div>
